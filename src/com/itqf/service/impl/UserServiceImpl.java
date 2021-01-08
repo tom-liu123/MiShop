@@ -6,6 +6,7 @@ import com.itqf.entity.Users;
 import com.itqf.service.UserService;
 import com.itqf.utils.Base64Utils;
 import com.itqf.utils.EmailUtils;
+import com.itqf.utils.SysConstant;
 
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
@@ -49,5 +50,15 @@ public class UserServiceImpl implements UserService {
             EmailUtils.sendEmail(title,content,users.getUemail());
         }
         return i;
+    }
+
+    @Override
+    public int activeAccount(String code) throws SQLException {
+        int status = userDao.findUstatus(code);
+        if (status == SysConstant.Status.NOT_ACTIVE.getCode()){
+           int i = userDao.updateAccount(code);
+            return i;
+        }
+        return 0;
     }
 }

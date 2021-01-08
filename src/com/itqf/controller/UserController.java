@@ -4,6 +4,7 @@ import com.itqf.entity.Users;
 import com.itqf.service.UserService;
 import com.itqf.service.impl.UserServiceImpl;
 import com.itqf.utils.ActiveCodeUtils;
+import com.itqf.utils.Base64Utils;
 import com.itqf.utils.SysConstant;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -54,6 +55,21 @@ public class UserController extends HttpServlet {
                  e.printStackTrace();
              }
 
+         }else if ("activeAccount".equals(method)){
+             String c = req.getParameter("c");
+             c = Base64Utils.decode(c);
+             try {
+                int i = userService.activeAccount(c);
+                if (i>0){
+                    req.setAttribute("msg","激活成功");
+                }else{
+                    req.setAttribute("msg","激活失败");
+
+                }
+                req.getRequestDispatcher("message.jsp").forward(req,resp);
+             } catch (SQLException throwables) {
+                 throwables.printStackTrace();
+             }
          }
     }
 

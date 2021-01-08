@@ -5,6 +5,7 @@ import com.itqf.entity.Users;
 import com.itqf.utils.C3P0Utils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 
 import javax.sql.rowset.spi.SyncResolver;
 import java.sql.SQLException;
@@ -34,6 +35,25 @@ public class UserDaoImpl implements UserDao {
                 users.getUrole(), users.getUcode());
 
 
+
+        return i;
+    }
+
+    @Override
+    public int findUstatus(String code) throws SQLException {
+        String sql = "select u_ststus from user where u_code =?";
+        Object o = queryRunner.query(sql,new ScalarHandler(),code);
+        if (o == null){
+            return 2;
+        }
+
+        return (int) o;
+    }
+
+    @Override
+    public int updateAccount(String code) throws SQLException {
+        String sql = "update user set u_status =1,code=null where u_code=?";
+        int i = queryRunner.update(sql,code);
 
         return i;
     }

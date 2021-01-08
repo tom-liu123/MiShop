@@ -14,4 +14,5 @@ import java.sql.SQLException;
 public interface UserService {
     public Users login(String username,String password) throws SQLException;
     public int register(Users users) throws SQLException, UnknownHostException;
+    public int activeAccount(String code) throws SQLException;
 }
