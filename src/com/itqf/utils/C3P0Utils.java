@@ -3,20 +3,26 @@ package com.itqf.utils;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 
 /**
- * @author LiuCongYang
- * @Version 1.0.0
- * create at @date  2021/1/4 19:14
- * copyright Beijing Murong Information Technology Co.,Ltd.
+ * @Description: 获得DataSource对象
+ * @Company: 刘先生
+ * @Author: 刘先生
+ * @Date: 2020/9/14
+ * @Time: 下午3:14
  */
 public class C3P0Utils {
+
     static DataSource dataSource;
-    public static DataSource getDataSource(){
+
+    public static DataSource getDataSource() {
+        //dataSource = new DruidDataSource();
         dataSource = new ComboPooledDataSource();
         return dataSource;
     }
 
+    public  static  void  main(String[]args) throws SQLException {
+        System.out.println(getDataSource().getConnection());
+    }
 }

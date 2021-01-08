@@ -9,56 +9,73 @@ import com.itqf.utils.EmailUtils;
 import com.itqf.utils.SysConstant;
 
 import java.net.Inet4Address;
-import java.net.UnknownHostException;
 import java.sql.SQLException;
 
 /**
- * @author LiuCongYang
- * @Version 1.0.0
- * create at @date  2021/1/4 19:53
- * copyright Beijing Murong Information Technology Co.,Ltd.
+ * @Description:
+ * @Company: åˆ˜å…ˆç”Ÿ
+ * @Author: åˆ˜å…ˆç”Ÿ
+ * @Date: 2020/9/14
+ * @Time: ä¸‹åˆ3:54
  */
 public class UserServiceImpl implements UserService {
     //dao
-    UserDao userDao = new UserDaoImpl();
+    UserDao userDao = new UserDaoImpl();;
+
     @Override
     public Users login(String username, String password) throws SQLException {
-        Users u =userDao.findByUsername(username);
-        if (u!= null){
+       Users u =  userDao.findByUsername(username);
+        if (u!=null){
             if (u.getUpassword().equals(password)){
                 return u;
             }
         }
-
         return null;
     }
 
+
     @Override
-    public int register(Users users) throws SQLException, UnknownHostException {
-        //ĞÂÔöÊı¾İ¿â
+    public int register(Users users) throws SQLException {
+        //1.æ–°å¢æ•°æ®åº“
         int i = userDao.insertUser(users);
-        if (i>0){
-            //¸øÓÃ»§µÄÓÊÏä·¢ÑéÖ¤Âë,È·ÈÏÓÊÏäÊÇ·ñ¿ÉÓÃ
-            String title ="Ğ¡Ã×ÉÌ³ÇÓÃ»§";
-            String ip = Inet4Address.getLocalHost().getHostAddress();
-            //Î´±àÂëµÄ¼¤»îÂë   md5
-            String c = Base64Utils.encode(users.getUcode());
-            String url = "http://"+ip+":8080/userController?method=activeAccount&c="+c;
-            String content = users.getUsername()+"<br>ÄúºÃ£¬<a herf='"+url+"'>Çëµ¥»÷¸ÃÁ´½Ó</a>¼¤»îÕË»§";
+       try {
+           if (i > 0) {
+               //2.ç»™ç”¨æˆ·çš„é‚®ç®±å‘é€æ¿€æ´»ç   ç¡®è®¤é‚®ç®±æ˜¯å¦å¯ç”¨
+               String title = "å°ç±³å•†åŸæ¿€æ´»è´¦æˆ·";
+               String ip = Inet4Address.getLocalHost().getHostAddress();
+               // users.getUcode();  æœªç¼–ç çš„æ¿€æ´»ç   md5
+               //
+               String c = Base64Utils.encode(users.getUcode());
+               //www.taobao.com/user
+               String url="http://"+ip+":8080/userController?method=activeAccount&c="+c;
+               String content = users.getUsername() + ":<br>æ‚¨å¥½,<a href='"+url+ "'>è¯·ç‚¹å‡»è¯¥é“¾æ¥æ¿€æ´»è´¦æˆ·</a>";
 
+               EmailUtils.sendEmail(title,content,users.getUemail());
+           }
+       }catch (Exception e){
 
-            EmailUtils.sendEmail(title,content,users.getUemail());
-        }
+       }
+
         return i;
     }
 
     @Override
     public int activeAccount(String code) throws SQLException {
-        int status = userDao.findUstatus(code);
-        if (status == SysConstant.Status.NOT_ACTIVE.getCode()){
-           int i = userDao.updateAccount(code);
-            return i;
+        int status = userDao.findUStatusByCode(code);
+        if (status==SysConstant.Status.NOT_ACTIVE.getCode()) {
+          int i =   userDao.updateAccount(code);
+          return  i;
         }
+
         return 0;
+    }
+
+    @Override
+    public boolean checkName(String username) throws SQLException {
+        Users u = userDao.findByUsername(username);
+        if (u!=null){
+            return true;
+        }
+        return false;
     }
 }

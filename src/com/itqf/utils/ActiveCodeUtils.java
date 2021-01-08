@@ -4,8 +4,8 @@ import java.util.Random;
 
 /**
  * @Description:  获得一个激活码  用随机数  或者  随机字母串
- * @Company: 千锋互联
- * @Author: 李丽婷
+ * @Company: 刘先生
+ * @Author: 刘先生
  * @Date: 2020/9/14
  * @Time: 下午5:01
  */

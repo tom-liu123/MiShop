@@ -21,26 +21,58 @@
 			}
 		})
 	}
-	function mNum(pid,p,no){
+	function mNum(pid,p,no){// pid  price 行号
 		var num = -1; //数量
 		var nums = $("#num_count"+no).val();
+		var btn =  $(this);
 		if(Number(nums)<=1){
 			if(confirm("确认要删除吗?")){
-				num = 0;
+				$.get("cartController?method=delCart",{"pid":pid},
+				function (data) {
+                    console.log(data.code+"--"+ typeof  data.code);
+					if(data.code==1){//删除成功
+                        //location.href = "cartController?method=getCart";  整个页面刷新
+						// -- <tr id="tr_${i.count}">
+
+						$("#tr_"+no).remove();
+						var sum = $("#totalSum").html();
+						console.log(sum+"--"+ $("#totalSum"))
+						sum = sum - p;
+						$("#totalSum").html(sum);//text();
+
+					}else if(data.code==2){
+					    	location.href="login.jsp";
+					}
+					else{
+					    alert("删除失败");
+					}
+                },"json");
+
+				return;
+
 			}else{
 				return;
 			}
 		}
+
 		$.ajax({
-			url:"updateCartNum?pid="+pid+"&num="+num+"&price="+p,
+			//updateCartNum
+			url:"cartController?method=updateCartNum&pid="+pid+"&price="+p,
 			method:"get",
-			success:function(){
-				location.href = "getCart";
+			success:function(data){
+
+				if (data.code==1){
+                    location.href = "cartController?method=getCart";
+				} else{
+				    alert('修改失败');
+				   // return;
+				}
+
 			},
 			error:function(){
 				alert("服务器异常");
 			}
-		})
+		},"json")
 	}
 	function clearCart(pid){
 		if(confirm("确认要删除吗")){
@@ -68,27 +100,29 @@
  				</tr>
  				<c:set value="0" var="sum"></c:set>
  				<c:forEach items="${carts}" var="c" varStatus="i">
-	 				<tr>
+	 				<tr id="tr_${i.count}">
 	 					<th>${i.count}</th>
-	 					<th>${c.goods.name}</th>
-	 					<th>${c.goods.price}</th>
+						<!--private  Product product;//一条购物车信息对应一个商品-->
+	 					<th>${c.product.pname}</th>
+	 					<th>${c.product.pprice}</th>
 	 					<th width="100px">
 		 					<div class="input-group">
 		 						<span class="input-group-btn">
-		 							<button class="btn btn-default" type="button" onclick="mNum(${c.goods.id},${c.goods.price},${i.count})">-</button>
+		 							<button class="btn btn-default" type="button" onclick="mNum(${c.product.pid},${c.product.pprice},${i.count})">-</button>
 		 						</span>
-		 						<input type="text" class="form-control" id="num_count${i.count}" value="${c.num}" readonly="readonly" style="width:40px">
+		 						<input type="text" class="form-control" id="num_count${i.count}" value="${c.cnum}" readonly="readonly" style="width:40px">
 		 						<span class="input-group-btn">
-		 							<button class="btn btn-default" type="button" onclick="pNum(${c.goods.id},${c.goods.price},${i.count})">+</button>
+		 							<button class="btn btn-default" type="button" onclick="pNum(${c.product.pid},${c.product.pprice},${i.count})">+</button>
 		 						</span>
 	 						</div>
 	 					</th>
-	 					<th>¥&nbsp;${c.money }</th>
+	 					<th>¥&nbsp;${c.ccount }</th>
 	 					<th>
-	 						<button type="button" class="btn btn-default" onclick="clearCart(${c.goods.id})">删除</button>
+	 						<button type="button" class="btn btn-default" onclick="clearCart(${c.product.pid})">删除</button>
 	 					</th>
 	 				</tr>
-	 				<c:set var="sum" value="${sum+c.money}"></c:set>
+					<!--累加总金额-->
+	 				<c:set var="sum" value="${sum+c.ccount}"></c:set>
  				</c:forEach>
 			</table>
 		</div>
@@ -100,12 +134,12 @@
 	            <div>
 	            	<a id="removeAllProduct" href="javascript:clearCart(0)" class="btn btn-default btn-lg">清空购物车</a>
 	            	&nbsp;&nbsp;
-	            	<a href="${pageContext.request.contextPath}/getOrderView" class="btn  btn-danger btn-lg">添加收货地址</a>
+	            	<a href="${pageContext.request.contextPath}/orderController?method=getOrderView" class="btn  btn-danger btn-lg">购买</a>
 	            	
 	            </div>
 	            <br><br>
 	            <div style="margin-bottom: 20px;">        		  
-	            	商品金额总计：<span id="total" class="text-danger"><b>￥&nbsp;&nbsp;${sum}</b></span>
+	            	商品金额总计：<span id="total" class="text-danger">￥&nbsp;&nbsp;<b id="totalSum">${sum}</b></span>
 	            </div>
 		</div>
 	</div>

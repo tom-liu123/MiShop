@@ -1,5 +1,7 @@
 package com.itqf.controller;
 
+import cn.dsna.util.images.ValidateCode;
+import com.itqf.anno.ContentType;
 import com.itqf.entity.Users;
 import com.itqf.service.UserService;
 import com.itqf.service.impl.UserServiceImpl;
@@ -8,105 +10,151 @@ import com.itqf.utils.Base64Utils;
 import com.itqf.utils.SysConstant;
 import org.apache.commons.beanutils.BeanUtils;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * @author LiuCongYang
- * @Version 1.0.0
- * create at @date  2021/1/4 19:31
- * copyright Beijing Murong Information Technology Co.,Ltd.
+ * @Description:  Â§ÑÁêÜÁî®Êà∑ÊâÄÊúâ‰∏öÂä°
+ * @Company: ÂàòÂÖàÁîü
+ * @Author: ÂàòÂÖàÁîü
+ * @Date: 2020/9/14
+ * @Time: ‰∏ãÂçà3:36
  */
 @WebServlet("/userController")
-public class UserController extends HttpServlet {
+public class UserController extends BaseController{
+
     UserService userService = new UserServiceImpl();
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-         String method = req.getParameter("method");
-         if (method.equals("userLogin")){
-             login(req, resp);
-         }else if (method.equals("register")){
-             //◊¢≤·
-             //Ω” ’”√ªß–≈œ¢
-             Users users = new Users();
-             try {
-                 BeanUtils.populate(users,req.getParameterMap());
-                 //2.∏¯“≥√Ê√ª”–∏≥÷µµƒ◊÷∂Œ∏≥÷µ
-                 users.setUstatus(SysConstant.Status.NOT_ACTIVE.getCode());
-                 users.setUcode(ActiveCodeUtils.getActiveCode());//º§ªÓ¬Î
-                 users.setUrole(SysConstant.CUSTOMER);
 
-                 int i =userService.register(users);
-                 if (i>0){
-                     resp.sendRedirect("registerSuccess.jsp");
-                 }else {
-                     req.setAttribute("registerMsg","◊¢≤· ß∞‹");
-                     req.getRequestDispatcher("register.jsp").forward(req,resp);
-                 }
+    public String activeAccount(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        //String url="http://"+ip+":8080/userController?method=activeAccount&c="+c;
+        //ÊøÄÊ¥ªË¥¶Êà∑
+        //u_status  u_code
+        String c = req.getParameter("c");//ÁºñÁ†ÅËøá
+        //Ëß£Á†Å  Âõ†‰∏∫Êï∞ÊçÆÂ∫ìÂ≠òÂÇ®ÁöÑÊòØÊú™ÁºñÁ†ÅËøáÁöÑ
+        c = Base64Utils.decode(c);
 
-             } catch (Exception e) {
-                 e.printStackTrace();
-             }
+        try {
+           int i =  userService.activeAccount(c);
+           if(i>0){
+               req.setAttribute("msg","ÊøÄÊ¥ªÊàêÂäüÔºåÊÇ®ÂèØ‰ª•ÁôªÂΩï‰∫Ü");
+           }else{
+               req.setAttribute("msg","ÊøÄÊ¥ªÂ§±Ë¥•ÔºÅ");
+           }
 
-         }else if ("activeAccount".equals(method)){
-             String c = req.getParameter("c");
-             c = Base64Utils.decode(c);
-             try {
-                int i = userService.activeAccount(c);
-                if (i>0){
-                    req.setAttribute("msg","º§ªÓ≥…π¶");
-                }else{
-                    req.setAttribute("msg","º§ªÓ ß∞‹");
-
-                }
-                req.getRequestDispatcher("message.jsp").forward(req,resp);
-             } catch (SQLException throwables) {
-                 throwables.printStackTrace();
-             }
-         }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return  SysConstant.FORWARD+SysConstant.FLAG+"message.jsp";
     }
 
-    private void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public String register(HttpServletRequest req, HttpServletResponse resp) throws  Exception {
+        //Ê≥®ÂÜå
+        //1,Êé•Êî∂Áî®Êà∑‰ø°ÊÅØ
+           Users users = new Users();
+
+            BeanUtils.populate(users,req.getParameterMap());
+            //2,ÁªôÈ°µÈù¢Ê≤°ÊúâËµãÂÄºÁöÑÂ≠óÊÆµËµãÂÄº
+            users.setUstatus(SysConstant.Status.NOT_ACTIVE.getCode());
+            users.setUcode(ActiveCodeUtils.getActiveCode());//ÊøÄÊ¥ªÁ†Å
+            users.setUrole(SysConstant.CUSTOMER);
+
+           int i =  userService.register(users);
+            if (i>0){
+                return SysConstant.REDIRECT+SysConstant.FLAG+"registerSuccess.jsp";
+            }else{
+                req.setAttribute("registerMsg","Ê≥®ÂÜåÂ§±Ë¥•");
+                return SysConstant.FORWARD+SysConstant.FLAG+"register.jsp";
+            }
+
+
+
+    }
+
+    public  String login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        //ÁôªÂΩï
         String name = req.getParameter("username");
         String password = req.getParameter("upassword");
+
         String code = req.getParameter("code");
         String scode = (String) req.getSession().getAttribute("code");
-        if (code.equalsIgnoreCase(scode)){
-            req.setAttribute("msg","—È÷§¬Î¥ÌŒÛ");
-            req.getRequestDispatcher("index.jsp").forward(req, resp);
-
-        }else{
+//        if (!code.equalsIgnoreCase(scode)) {
+//            req.setAttribute("msg", "È™åËØÅÁ†ÅÈîôËØØ");
+//        } else {
             try {
-                Users u = userService.login(name,password);
-                if (u!=null && u.getUstatus() == SysConstant.Status.NOT_ACTIVE.getCode()){
-                    req.setAttribute("msg","’À∫≈√ªº§ªÓ");
-                    req.getRequestDispatcher("/login.jsp").forward(req, resp);
+                Users u = userService.login(name, password);
+                //if(u!=null&&u.getUstatus()==SysConstant.NOT_ACTIVE){
 
-                }else if (u!=null && u.getUstatus() == SysConstant.Status.ACTIVE.getCode()){
-                    req.setAttribute("user",u);
-                    req.getRequestDispatcher("/login.jsp").forward(req, resp);
-                }else {
-                    req.setAttribute("msg","”√ªß√˚√‹¬Î¥ÌŒÛ");
-                    req.getRequestDispatcher("/login.jsp").forward(req, resp);
+                if (u != null && u.getUstatus() == SysConstant.Status.NOT_ACTIVE.getCode()) {
+                    req.setAttribute("msg", "Ë¥¶Âè∑Ê≤°ÊøÄÊ¥ª");
+                } else if (u != null && u.getUstatus() == SysConstant.Status.ACTIVE.getCode()) {
+                    req.getSession().setAttribute("user", u);//redis
+                    return SysConstant.FORWARD + SysConstant.FLAG + "index.jsp";
+                } else {
+                    req.setAttribute("msg", "Áî®Êà∑ÂêçÊàñËÄÖÂØÜÁ†ÅÈîôËØØ");
                 }
 
 
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        //}
+        return SysConstant.FORWARD + SysConstant.FLAG + "login.jsp";
+
+    }
+
+    //@ContentType(value="image/jpg")
+    @ContentType("image/jpg")
+    public void  code(HttpServletRequest req, HttpServletResponse resp) throws  Exception{
+        ValidateCode code = new ValidateCode(100,40,4,5);
+        String textCode= code.getCode();
+        req.getSession().setAttribute("code",textCode);
+
+        ImageIO.write(code.getBuffImg(),"jpg",resp.getOutputStream());
+    }
+
+
+
+    //@ContentType(value = "application/json;charset=utf-8")
+//    public void checkName(HttpServletRequest req, HttpServletResponse resp) throws  Exception{
+//        String username = req.getParameter("username");
+//        boolean f = userService.checkName(username);
+//        Map<String,Object> map = new HashMap<>();
+//
+//        if (f){//Êúâ {data:1}
+//            map.put("data",1);
+//        }else
+//        {
+//            map.put("data",0);
+//        }
+//        Gson gson = new Gson();
+//        String json  = gson.toJson(map);
+//        resp.getWriter().print(json);
+//    }
+
+    @ContentType(value = "application/json;charset=utf-8")
+    public Map<String,Object> checkName(HttpServletRequest req, HttpServletResponse resp) throws  Exception{
+        String username = req.getParameter("username");
+        boolean f = userService.checkName(username);
+        Map<String,Object> map = new HashMap<>();
+
+        if (f){//Êúâ {data:1}
+            map.put("data",1);
+        }else
+        {
+            map.put("data",0);
         }
-
+        return  map;
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        this.doGet(req,resp);
-    }
+
+
+
 }

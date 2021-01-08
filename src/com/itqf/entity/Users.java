@@ -1,20 +1,31 @@
 package com.itqf.entity;
 
 /**
- * @author LiuCongYang
- * @Version 1.0.0
- * create at @date  2021/1/4 19:16
- * copyright Beijing Murong Information Technology Co.,Ltd.
+ * @Description:
+ * @Company: 刘先生
+ * @Author: 刘先生
+ * @Date: 2020/9/14
+ * @Time: 下午3:17
  */
 public class Users {
     private int id;
     private String username;
     private String upassword;
     private String usex;
+    private String uemail;
+
     private int ustatus;
     private String ucode;
-    private String uemail;
-    private int urole;
+    private int urole; //后台类  shiro
+
+
+    public String getUemail() {
+        return uemail;
+    }
+
+    public void setUemail(String uemail) {
+        this.uemail = uemail;
+    }
 
     public int getId() {
         return id;
@@ -70,13 +81,5 @@ public class Users {
 
     public void setUrole(int urole) {
         this.urole = urole;
-    }
-
-    public String getUemail() {
-        return uemail;
-    }
-
-    public void setUemail(String uemail) {
-        this.uemail = uemail;
     }
 }

@@ -19,7 +19,7 @@
 			<div class="panel-body">
 			    <h3 class="text-default"><span class="glyphicon glyphicon-ok-sign"></span>&nbsp;&nbsp;&nbsp;&nbsp;添加购物车成功!!</h3>
 				<hr>
-				<a href="${pageContext.request.contextPath}/getCart" class="btn btn-primary">查看购物车</a>&nbsp;&nbsp;&nbsp;&nbsp;
+				<a href="${pageContext.request.contextPath}/cartController?method=getCart" class="btn btn-primary">查看购物车</a>&nbsp;&nbsp;&nbsp;&nbsp;
 				<a href="#" class="btn btn-default">继续购物</a>
 			</div>
 		</div>

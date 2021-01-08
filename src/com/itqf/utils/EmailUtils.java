@@ -17,7 +17,7 @@ import java.util.Properties;
  * */
 public class EmailUtils {
 	public static void sendEmail(String title,String content,String receiveAccount){
-		String  myAccount = "2338879935@qq.com";
+		String  myAccount = "1512018642@qq.com";
 		//发件人 邮箱的 SMTP 服务器地址
 		//String SMTPHost = "smtp.163.com";//163
 		String SMTPHost = "smtp.qq.com";//qq
@@ -51,14 +51,15 @@ public class EmailUtils {
 			String ip = Inet4Address.getLocalHost().getHostAddress();//本机ip地址
 			//www.xiaomi.com
 			//String url = "http://"+ip+":8080/activate?c=");
+
+			//message.setText(content);  普通文本
 			//设置邮件正文 setContent 可以使用html标签
-			message.setText(content);
+			message.setContent(content,"text/html;charset=utf-8");
 			//设置邮件的发送时间 是立即发送
 			//message.setSentDate(new Date());
 			//保存设置
 			message.saveChanges();
 			//4.利用Transport 发送邮件
-
 			Transport tran = session.getTransport();
 			//连接服务器 确认发送方 是否授权
 			tran.connect(myAccount,"gwijeuhwgxnjhgcd" );
@@ -75,8 +76,9 @@ public class EmailUtils {
 		
 	}
 
-	public  static  void  main(String[]args){
-		 sendEmail("哈喽","你好","1633791628@qq.com");
+	public  static  void  main(String[]args) throws  Exception{
+		 //sendEmail("哈喽","你好","1633791628@qq.com");
+		System.out.println(Inet4Address.getLocalHost().getHostAddress());
 
 
 	}

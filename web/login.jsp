@@ -21,7 +21,7 @@
 		});
 		//2.点击验证码 跟新验证码
 		$("#pagecode").click(function(){
-			$("#pagecode").attr("src","code?"+Math.random());
+			$("#pagecode").attr("src","userController?method=code&t="+Math.random());
 		});
 		//3.验证输入的验证码 是否正确
 		$("#vcode").change(function(){
@@ -54,7 +54,7 @@
 				<a href="${pageContext.request.contextPath }/index.jsp" target="_blank"><img src="./image/mistore_logo.png" alt=""></a>
 			</div>
 		</div>
-		<form  method="post" action="userController?method=userLogin" class="form center" id="userLogin" >
+		<form  method="post" action="userController?method=login" class="form center" id="userLogin" >
 		<div class="login">
 			<div class="login_center">
 				<div class="login_top">
@@ -80,7 +80,7 @@
 					<div class="username">
 						<div class="left fl">验证码:&nbsp;</div>
 						<div class="right fl"><input class="yanzhengma" id="vcode" type="text" name="code" placeholder="验证码"/>
-						<img  id="pagecode" src="code"><label id="checkMsg"></label></div>					
+						<img  id="pagecode" src="userController?method=code"><label id="checkMsg"></label></div>
 					</div>
 					<div class="username">
 						<div class="left fl">&nbsp;&nbsp;&nbsp;&nbsp;</div>

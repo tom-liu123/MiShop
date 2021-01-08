@@ -11,12 +11,12 @@
     <script type="text/javascript">
         $(document).ready(function(){
             $.ajax({
-                url:"${pageContext.request.contextPath}/goodsTypeAjax",
+                url:"${pageContext.request.contextPath}/goodsController?method=getAllType",
                 type:"GET",
                 dataType:"json",
                 success:function(data){
                     for(var i in data){
-                        var a = $("<a href='${pageContext.request.contextPath}/getGoodsListByTypeId?typeid="+data[i].id+"'>"+data[i].name+"</a>");
+                        var a = $("<a href='${pageContext.request.contextPath}/goodsController?method=getGoodsByTypeId&typeId="+data[i].tid+"'>"+data[i].tname+"</a>");
                         $("#goodsType").append(a);
 
                     }
@@ -41,23 +41,23 @@
             </span>
 
             <span style="float:right">
-           		<c:if test="${empty loginUser}">
+           		<c:if test="${empty user}">
                     <a href="login.jsp" id="a_top">登录</a>
                     <li>|</li>
                     <a href="register.jsp" id="a_top">注册</a>
                 </c:if>
-       			<c:if test="${not empty loginUser}">
+       			<c:if test="${not empty user}">
                     <a href="userAddress?flag=show" id="a_top">${user.username}</a>
                     <li>|</li>
                     <a href="userservlet?method=logOut" id="a_top">注销</a>
                     <li>|</li>
-                    <a href="getOrderList" id="a_top">我的订单</a>
+                    <a href="orderController?method=showAllOrder" id="a_top">我的订单</a>
                     <li>|</li>
                     <a href="userservlet?method=getAddress" id="a_top">地址管理</a>
                 </c:if>
                 <li>|</li>
                 <a href="" id="a_top">消息通知</a>
-                <a href="${pageContext.request.contextPath}/cartservlet?method=getCart" id="shorpcar">购物车</a>
+                <a href="${pageContext.request.contextPath}/cartController?method=getCart" id="shorpcar">购物车</a>
             </span>
         </div>
  </div>

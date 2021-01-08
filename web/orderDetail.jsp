@@ -26,21 +26,21 @@
 
 		<tr>
 			<td>订单编号:</td>
-			<td>${od.order.id}</td>
+			<td>${orders.oid}</td>
 			<td>订单时间:</td>
-			<td>${od.order.time}</td>
+			<td>${orders.otime}</td>
 		</tr>
 		<tr>
 			<td>收件人:</td>
-			<td>${od.address.name}</td>
+			<td>${orders.address.aname}</td>
 			<td>联系电话:</td>
-			<td>${od.address.phone}</td>
+			<td>${orders.address.aphone}</td>
 		</tr>
 		<tr>
 			<td>送货地址:</td>
-			<td>${od.address.detail}</td>
+			<td>${orders.address.adetail}</td>
 			<td>总价:</td>
-			<td>${od.order.money}</td>
+			<td>${orders.ocount}</td>
 		</tr>
 		<tr>
 			<td align="center">商品列表:</td>
@@ -56,18 +56,22 @@
 						<th>购买数量</th>
 						<th>小计</th>
 					</tr>
-					<c:forEach items="${od.list}" var="item" varStatus="i">
+					<!--
+					 //订单详情
+    						private List<Item> itemList;//一个订单包含多个订单项
+					-->
+					<c:forEach items="${orders.itemList}" var="item" varStatus="i">
 						<tr align="center">
 							<th>${i.count}</th>
 							<th>
-								<img src="${pageContext.request.contextPath}/goodsImgs/${item.goods.picture}" width="50px" height="50px">
+								<img src="${pageContext.request.contextPath}/${item.product.pimage}" width="50px" height="50px">
 							</th>
-							<th>${item.goods.name}</th>
-							<th>${item.goods.star}</th>
-							<th>${item.goods.pubdate}</th>
-							<th>${item.goods.price}</th>
-							<th>${item.num}</th>
-							<th>${item.money}</th>
+							<th>${item.product.pname}</th>
+							<th>${item.product.pstate}</th>
+							<th>${item.product.ptime}</th>
+							<th>${item.product.pprice}</th>
+							<th>${item.inum}</th>
+							<th>${item.icount}</th>
 						</tr>
 					</c:forEach>
 				</table>
@@ -77,10 +81,10 @@
 			<td align="right" colspan="4" style="margin-right: 40px;">
 				<a href="${pageContext.request.contextPath }/getOrderList" class="btn btn-danger btn-sm">返回订单列表</a>
 				&nbsp;&nbsp;
-				<c:if test="${od.order.status eq 1 }">
-					<button type="button" onclick="pay('${od.order.id}','${od.order.money}')" class="btn btn-warning btn-sm">易付宝支付</button>
+				<c:if test="${orders.ostate eq 0 }">
+					<button type="button" onclick="pay('${orders.oid}','${orders.ocount}')" class="btn btn-warning btn-sm">易付宝支付</button>
 						&nbsp;&nbsp;
-					<button type="button" onclick="payWeiXin('${od.order.id}','${od.order.money}')" class="btn btn-success btn-sm">微信支付</button>
+					<button type="button" onclick="payWeiXin('${orders.oid}','${orders.ocount}')" class="btn btn-success btn-sm">微信支付</button>
 				</c:if>
 			</td>
 		</tr>
